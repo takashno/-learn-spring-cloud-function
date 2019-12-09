@@ -2,6 +2,9 @@ package com.zomu.t.learnspringcloudfunction.bean;
 
 import java.io.Serializable;
 
+/**
+ * Sample Bean.
+ */
 public class Hoge implements Serializable {
 
     private String name;

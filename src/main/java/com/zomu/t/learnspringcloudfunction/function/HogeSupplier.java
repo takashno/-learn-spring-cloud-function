@@ -1,4 +1,4 @@
-package com.zomu.t.learnspringcloudfunction.functions;
+package com.zomu.t.learnspringcloudfunction.function;
 
 import com.zomu.t.learnspringcloudfunction.bean.Hoge;
 
