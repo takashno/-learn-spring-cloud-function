@@ -17,7 +17,9 @@ ext {
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.cloud:spring-cloud-function-web'
 	implementation 'org.springframework.cloud:spring-cloud-function-context'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
@@ -32,4 +34,24 @@ dependencyManagement {
 
 test {
 	useJUnitPlatform()
+}
+
+// Javadoc Error Ignore
+tasks.withType(Javadoc) {
+	options.charSet = "UTF-8"
+	options.encoding = "UTF-8"
+	options.addBooleanOption("Xdoclint:none", true)
+}
+
+// Java Compile Config
+tasks.withType(JavaCompile) {
+	sourceCompatibility = '11'
+	targetCompatibility = '11'
+	it.options.encoding = 'UTF-8'
+}
+
+// JavaDoc Jar packaging
+task packageJavadoc(type: Jar, dependsOn: javadoc) {
+	from javadoc.destinationDir
+	classifier = 'javadoc'
 }
