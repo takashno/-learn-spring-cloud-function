@@ -1,18 +1,21 @@
 package com.zomu.t.learnspringcloudfunction;
 
-
-import com.zomu.t.learnspringcloudfunction.bean.Hoge;
-import com.zomu.t.learnspringcloudfunction.function.HogeConsumer;
-import com.zomu.t.learnspringcloudfunction.function.HogeFunction;
-import com.zomu.t.learnspringcloudfunction.function.HogeSupplier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
+
+import com.zomu.t.learnspringcloudfunction.bean.Hoge;
+import com.zomu.t.learnspringcloudfunction.function.FugaConsumer;
+import com.zomu.t.learnspringcloudfunction.function.HogeConsumer;
+import com.zomu.t.learnspringcloudfunction.function.HogeFunction;
+import com.zomu.t.learnspringcloudfunction.function.HogeSupplier;
+import com.zomu.t.learnspringcloudfunction.function.PiyoConsumer;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Configuration
 public class LearnSpringCloudFunctionConfiguration {
@@ -35,5 +38,15 @@ public class LearnSpringCloudFunctionConfiguration {
     @Bean("consumer")
     public Consumer<String> consumer() {
         return new HogeConsumer();
+    }
+
+    @Bean("fuga_con")
+    public Consumer<Message<String>> fugaConsumer() {
+        return new FugaConsumer();
+    }
+
+    @Bean("piyo_con")
+    public Consumer<Message<Hoge>> piyoConsumer() {
+        return new PiyoConsumer();
     }
 }
