@@ -121,7 +121,7 @@ Swagger-UIではAPI仕様が表示できなかったので、Controllerがどう
 
 ### Implements and Publish Function
 
-#### @Component + @ComponentScan
+#### `@Component` + ComponentScan
 
 ```java
 @Component("hogecon")
@@ -140,7 +140,7 @@ SpringのComponentScanの機能を利用して、API公開したい関数を登�
 `@Component("{name}")` で指定した `{name}` がURLになる。  
 つまり、 http://localhost:8080/{name} ということになる。
 
-#### @Configuration + @Bean
+#### `@Configuration` + `@Bean`
 
 ```java
 public class HogeConsumer implements Consumer<String> {
@@ -164,7 +164,7 @@ public class SampleConfiguration {
 }
 ```
 
-SpringのConfigurationクラスにてBeanを定義して、API公開したい関数を登録する方法。  
+Springの `Configuration` クラスにてBeanを定義して、API公開したい関数を登録する方法。  
 `@Bean("｛name}")` で指定した `{name}` がURLになる。  
 つまり、 http://localhost:8080/{name} ということになる。
 
