@@ -45,7 +45,7 @@ public class LearnSpringCloudFunctionConfiguration {
         return new FugaConsumer();
     }
 
-    @Bean("piyo_con")
+    @Bean("piyo_con/{aaa}")
     public Consumer<Message<Hoge>> piyoConsumer() {
         return new PiyoConsumer();
     }

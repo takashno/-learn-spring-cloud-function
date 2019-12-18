@@ -51,4 +51,92 @@ $ curl -v localhost:8080/function -d 'hello'
 ```bash
 $ curl -v localhost:8080/supplier
 
-``v
+```
+
+
+# 調査事項
+
+## 試しにSpringFoxを利用してSwagger-UIで覗いてみた
+
+`FunctionalInterface` で実装した関数がAPI化されるため、  
+この仕様がSpringFox（つまり、Swagger-UI）で表示することができたら  
+仕様の展開がとても楽であるし、クライアントサイドもSwaggerを用いて実装できるので良いと考えて試してみた。
+
+build.gradle
+```groovy
+dependencies {
+
+    // omitted
+
+	implementation "io.springfox:springfox-swagger2:2.9.2"
+	implementation "io.springfox:springfox-swagger-ui:2.9.2"
+
+}
+```
+
+起動をして、 http://localhost:8080/swagger-ui.html にアクセスするとWEBページが表示される。  
+結果としては残念ながらSwagger-UIで定義した関数のAPIは確認できなかった。  
+これはつまり、SpringMVCのControllerとして扱われていないということになる。
+
+## Controller
+
+Swagger-UIではAPI仕様が表示できなかったので、Controllerがどうなっているのかを調べた。  
+`spring-cloud-function-web` を使用した場合、Functionを取り込んでControllerを自動的に作り出しているわけではなさそう。  
+実態の `Ｃｏｎｔｒｏｌｌｅｒ` は `org.springframework.cloud.function.web.mvc.FunctionController` であるようだ。  
+
+もしかしたら `SpringDataRest` とかもこういう作りになっているのかもしれない。
+
+
+## APIを公開方法
+
+### 関数の実装方法
+
+#### @ComponentScan
+
+```java
+@Component("hogecon")
+public class HogeConsumer implements Consumer<String> {
+
+    private static final Logger logger = LoggerFactory.getLogger(HogeConsumer.class);
+
+    @Override
+    public void accept(String s) {
+        logger.info("accept. str -> {}", s);
+    }
+}
+```
+
+SpringのComponentScanの機能を利用して、API公開したい関数を登録する方法。  
+`@Component("{name}")` で指定した `{name}` がURLになる。  
+つまり、 http://localhost:8080/{name} ということになる。
+
+#### @Configuration + @Bean
+
+```java
+public class HogeConsumer implements Consumer<String> {
+
+    private static final Logger logger = LoggerFactory.getLogger(HogeConsumer.class);
+
+    @Override
+    public void accept(String s) {
+        logger.info("accept. str -> {}", s);
+    }
+}
+
+@Configuration
+public class SampleConfiguration {
+
+    @Bean("consumer")
+    public Consumer<String> consumer() {
+        return new HogeConsumer();
+    }
+
+}
+```
+
+SpringのConfigurationクラスにてBeanを定義して、API公開したい関数を登録する方法。  
+`@Bean("｛name}")` で指定した `{name}` がURLになる。  
+つまり、 http://localhost:8080/{name} ということになる。
+
+### メソッド
+
