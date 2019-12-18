@@ -1,6 +1,8 @@
 # learn-spring-cloud-function
 
-This is sample of "Spring Cloud Function" for my learning.  
+このプロジェクトは、`Spring Cloud Function` の学習用プロジェクト。  
+使い方を調べるための実装であって、本当に `Spring Cloud Function` を運用するのに適した実装内容とはなっていない。  
+今後別プロジェクトして、`AWS Lambda` 等にデプロイするためのプロジェクト構成は作ってみるつもりである。
 
 ## Build 
 
@@ -213,3 +215,19 @@ PathVariableにも対応していないように思える。
 
 依存関係としてBeanValidation系のライブラリは通ってはいるものの、関数の入力BeanにValidationアノテーションを記載しても、  
 その内容でBeanValidationを実施してくれるようなことはなかった。
+
+## Function Routing
+
+調査中  
+何に使えるんだ…
+
+```properties
+spring.cloud.function.definition=http/consumer
+spring.cloud.function.routing.enabled=true
+```
+
+上記のように定義して、 http://localhost:8080/functionRouter を実行すれば 「`http/consumer`」に該当する関数のAPIがコールできることはできるのだが…
+
+## AWS Lambda へのデプロイ
+
+公式ドキュメントを読み進めれば読み進めるほど、このまま進むのは適していないのだなと気付いたため別プロジェクトとする。
