@@ -8,45 +8,60 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 
-import com.zomu.t.learnspringcloudfunction.bean.Hoge;
-import com.zomu.t.learnspringcloudfunction.function.FugaConsumer;
-import com.zomu.t.learnspringcloudfunction.function.HogeConsumer;
-import com.zomu.t.learnspringcloudfunction.function.HogeFunction;
-import com.zomu.t.learnspringcloudfunction.function.HogeSupplier;
-import com.zomu.t.learnspringcloudfunction.function.PiyoConsumer;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import com.zomu.t.learnspringcloudfunction.function.http.HttpConsumer;
+import com.zomu.t.learnspringcloudfunction.function.http.HttpValidationConsumer;
+import com.zomu.t.learnspringcloudfunction.function.http.bean.BodyBean;
+import com.zomu.t.learnspringcloudfunction.function.http.bean.BodyValidationBean;
+import com.zomu.t.learnspringcloudfunction.function.simple.SimpleConsumer;
+import com.zomu.t.learnspringcloudfunction.function.simple.SimpleFunction;
+import com.zomu.t.learnspringcloudfunction.function.simple.SimpleSupplier;
 
 @Configuration
 public class LearnSpringCloudFunctionConfiguration {
 
-    @Bean
-    public Function<Flux<String>, Flux<String>> uppercase() {
-        return flux -> flux.map(value -> value.toUpperCase());
+    /* ------ simple ------ */
+
+    @Bean("simple/supplier")
+    public Supplier<String> simpleSupplier() {
+        return new SimpleSupplier();
     }
 
-    @Bean("supplier")
-    public Supplier<Hoge> sup() {
-        return new HogeSupplier();
+    @Bean("simple/function")
+    public Function<String, String> simpleFunction() {
+        return new SimpleFunction();
     }
 
-    @Bean("function")
-    public Function<Mono<String>, Mono<String>> function() {
-        return new HogeFunction();
+    @Bean("simple/consumer")
+    public Consumer<String> simpleConsumer() {
+        return new SimpleConsumer();
     }
 
-    @Bean("consumer")
-    public Consumer<String> consumer() {
-        return new HogeConsumer();
+    /* ------ bean ------ */
+
+    @Bean("bean/supplier")
+    public Supplier<String> beanSupplier() {
+        return new SimpleSupplier();
     }
 
-    @Bean("fuga_con")
-    public Consumer<Message<String>> fugaConsumer() {
-        return new FugaConsumer();
+    @Bean("bean/function")
+    public Function<String, String> beanFunction() {
+        return new SimpleFunction();
     }
 
-    @Bean("piyo_con/{aaa}")
-    public Consumer<Message<Hoge>> piyoConsumer() {
-        return new PiyoConsumer();
+    @Bean("bean/consumer")
+    public Consumer<String> beanConsumer() {
+        return new SimpleConsumer();
+    }
+
+    /* ------ http ------ */
+
+    @Bean("http/consumer")
+    public Consumer<Message<BodyBean>> httpConsumer() {
+        return new HttpConsumer();
+    }
+
+    @Bean("http/validation/consumer")
+    public Consumer<Message<BodyValidationBean>> httpValidationConsumer() {
+        return new HttpValidationConsumer();
     }
 }

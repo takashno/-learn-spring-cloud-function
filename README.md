@@ -40,7 +40,7 @@ $ curl -v localhost:8080/supplier
 {"name":"hogehoge","note":"notenote"}* Closing connection 0
 ```
 
-Supplier source is `com.zomu.t.learnspringcloudfunction.function.HogeSupplier`  
+Supplier source is `com.zomu.t.learnspringcloudfunction.function.simple.SimpleSupplier`  
 
 - function api
 ```bash
@@ -89,7 +89,7 @@ Swagger-UIではAPI仕様が表示できなかったので、Controllerがどう
 
 ## APIを公開方法
 
-### 関数の実装方法
+### Implements and Publish Function
 
 #### @ComponentScan
 
@@ -138,5 +138,18 @@ SpringのConfigurationクラスにてBeanを定義して、API公開したい関
 `@Bean("｛name}")` で指定した `{name}` がURLになる。  
 つまり、 http://localhost:8080/{name} ということになる。
 
-### メソッド
+### Method
 
+メソッドは指定できないように思える。  
+`org.springframework.cloud.function.web.mvc.FunctionController` を確認する限り、`GET/POST` の `/**` を対象にしている。  
+`FuncationalInterface` の種類とマッピングとしては、[公式ドキュメント](https://cloud.spring.io/spring-cloud-function/reference/html/spring-cloud-function.html#_standalone_web_applications) に記載がある。
+
+### PathVariable
+
+PathVariableにも対応していないように思える。  
+自分で独自に取り出すことは可能なのだろうが、SpringMVCのように簡単に取得できるようなものではない。
+
+### BeanValidation
+
+依存関係としてBeanValidation系のライブラリは通ってはいるものの、関数の入力BeanにValidationアノテーションを記載しても、  
+その内容でBeanValidationを実施してくれるようなことはなかった。

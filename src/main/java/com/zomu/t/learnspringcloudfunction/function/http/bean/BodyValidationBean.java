@@ -1,14 +1,21 @@
-package com.zomu.t.learnspringcloudfunction.bean;
+package com.zomu.t.learnspringcloudfunction.function.http.bean;
 
 import java.io.Serializable;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 
 /**
- * Sample Bean.
+ * Body Bean.
  */
-public class Hoge implements Serializable {
+public class BodyValidationBean implements Serializable {
 
+    @NotEmpty
+    @Pattern(regexp = "[abc]+")
     private String name;
 
+    @NotEmpty
+    @Pattern(regexp = "[123]+")
     private String note;
 
     public String getName() {
