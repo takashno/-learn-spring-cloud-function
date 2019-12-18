@@ -18,45 +18,75 @@ $ ./gradle bootRun
 
 ## Try Api
 
-- supplier api
+- Simple Supplier API
 
 ```bash
-$ curl -v localhost:8080/supplier
+curl -v http://localhost:8080/simple/supplier
 *   Trying ::1...
 * TCP_NODELAY set
 * Connected to localhost (::1) port 8080 (#0)
-> GET /supplier HTTP/1.1
+> GET /simple/supplier HTTP/1.1
 > Host: localhost:8080
-> User-Agent: curl/7.64.1
+> User-Agent: curl/7.55.1
 > Accept: */*
-> 
-< HTTP/1.1 200 
-< user-agent: curl/7.64.1
-< Content-Type: application/json
-< Transfer-Encoding: chunked
-< Date: Mon, 09 Dec 2019 16:29:24 GMT
-< 
+>
+< HTTP/1.1 200
+< user-agent: curl/7.55.1
+< Content-Type: text/plain;charset=UTF-8
+< Content-Length: 26
+< Date: Wed, 18 Dec 2019 06:19:10 GMT
+<
+SimpleSupplier#get called.* Connection #0 to host localhost left intact
+```
+
+- Simple Function API
+```bash
+curl -X POST -v http://localhost:8080/simple/function -H "Content-Type: plain/text" -d str
+Note: Unnecessary use of -X or --request, POST is already inferred.
+*   Trying ::1...
+* TCP_NODELAY set
+* Connected to localhost (::1) port 8080 (#0)
+> POST /simple/function HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.55.1
+> Accept: */*
+> Content-Type: plain/text
+> Content-Length: 3
+>
+* upload completely sent off: 3 out of 3 bytes
+< HTTP/1.1 200
+< user-agent: curl/7.55.1
+< Content-Type: text/plain;charset=UTF-8
+< Content-Length: 11
+< Date: Wed, 18 Dec 2019 06:23:53 GMT
+<
+str-add-str* Connection #0 to host localhost left intact
+```
+- Simple Consume API
+```bash
+curl -X POST -v http://localhost:8080/simple/consumer -H "Content-Type: plain/text" -d str
+Note: Unnecessary use of -X or --request, POST is already inferred.
+*   Trying ::1...
+* TCP_NODELAY set
+* Connected to localhost (::1) port 8080 (#0)
+> POST /simple/consumer HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.55.1
+> Accept: */*
+> Content-Type: plain/text
+> Content-Length: 3
+>
+* upload completely sent off: 3 out of 3 bytes
+< HTTP/1.1 202
+< Content-Length: 0
+< Date: Wed, 18 Dec 2019 06:24:42 GMT
+<
 * Connection #0 to host localhost left intact
-{"name":"hogehoge","note":"notenote"}* Closing connection 0
 ```
 
-Supplier source is `com.zomu.t.learnspringcloudfunction.function.simple.SimpleSupplier`  
+# Leaning...
 
-- function api
-```bash
-$ curl -v localhost:8080/function -d 'hello'
-
-```
-- consume api
-```bash
-$ curl -v localhost:8080/supplier
-
-```
-
-
-# 調査事項
-
-## 試しにSpringFoxを利用してSwagger-UIで覗いてみた
+## Try SpringFox and Swagger-UI
 
 `FunctionalInterface` で実装した関数がAPI化されるため、  
 この仕様がSpringFox（つまり、Swagger-UI）で表示することができたら  
@@ -82,16 +112,16 @@ dependencies {
 
 Swagger-UIではAPI仕様が表示できなかったので、Controllerがどうなっているのかを調べた。  
 `spring-cloud-function-web` を使用した場合、Functionを取り込んでControllerを自動的に作り出しているわけではなさそう。  
-実態の `Ｃｏｎｔｒｏｌｌｅｒ` は `org.springframework.cloud.function.web.mvc.FunctionController` であるようだ。  
+実態の `Controller` は `org.springframework.cloud.function.web.mvc.FunctionController` であるようだ。  
 
 もしかしたら `SpringDataRest` とかもこういう作りになっているのかもしれない。
 
 
-## APIを公開方法
+## Publish API
 
 ### Implements and Publish Function
 
-#### @ComponentScan
+#### @Component + @ComponentScan
 
 ```java
 @Component("hogecon")
@@ -138,11 +168,41 @@ SpringのConfigurationクラスにてBeanを定義して、API公開したい関
 `@Bean("｛name}")` で指定した `{name}` がURLになる。  
 つまり、 http://localhost:8080/{name} ということになる。
 
+#### Function Component Scan
+
+`Spring Cloud Function` では、「`@Component` + `@ComponentScan`」 や 「`@Configuration` + `@Bean`」による関数の登録以外に  
+`Function Component Scan` という独自の機能を持つ。  
+これは、`FunctionalInterface` のうち `Supplier`、`Consumer`、`Function` について自動でAPI公開する関数として認識させるものになる。
+
+この機能はデフォルトで 「`true`」となっており、「`functions`」というパッケージがあれば対象となるように組まれている。  
+`src/main/java/functions` という意味である。
+
+この機能の設定は、`application.properties` にて行える。
+
+```properties
+spring.cloud.function.scan.enabled=true
+spring.cloud.function.scan.packages=com.zomu.t.learnspringcloudfunction.scan1
+```
+
+複数パッケージは、カンマ区切りで指定可能となる。
+
+```properties
+spring.cloud.function.scan.enabled=true
+spring.cloud.function.scan.packages=com.zomu.t.learnspringcloudfunction.scan1,com.zomu.t.learnspringcloudfunction.scan2
+```
+  
+URLとしては、クラス名を `LowerCamel` にした文字が使用される。  
+`Scan1Consumer` というクラスの場合、 http://localhost:8080/scan1Consumer というURLになる。
+
 ### Method
 
 メソッドは指定できないように思える。  
 `org.springframework.cloud.function.web.mvc.FunctionController` を確認する限り、`GET/POST` の `/**` を対象にしている。  
 `FuncationalInterface` の種類とマッピングとしては、[公式ドキュメント](https://cloud.spring.io/spring-cloud-function/reference/html/spring-cloud-function.html#_standalone_web_applications) に記載がある。
+
+### Content-Type / Accept
+
+調査中
 
 ### PathVariable
 
